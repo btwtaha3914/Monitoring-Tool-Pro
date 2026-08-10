@@ -27,12 +27,14 @@ def discover_subdomains(domain):
     url = f"https://crt.sh/?q=%25.{domain}&output=json"
 
     subdomains = set()
+    discovery_error = None
 
     try:
 
         response = requests.get(
             url,
-            timeout=2000
+            timeout=15,
+            headers={"User-Agent": "Mozilla/5.0 (monitoring-tool)"},
         )
 
         response.raise_for_status()
@@ -63,16 +65,21 @@ def discover_subdomains(domain):
                     subdomains.add(name)
 
     except requests.RequestException as error:
+        discovery_error = f"crt.sh request failed: {error}"
+        print(f"Subdomain discovery failed: {discovery_error}")
 
-        print(
-            f"Subdomain discovery failed: {error}"
-        )
+    except ValueError as error:
+        # crt.sh returned a non-JSON body (common when it's rate-limiting
+        # or under heavy load -- it serves an HTML/plaintext error page
+        # instead of JSON in that case, and .json() raises ValueError).
+        discovery_error = f"crt.sh returned an unexpected (non-JSON) response: {error}"
+        print(f"Subdomain discovery failed: {discovery_error}")
 
     # IMPORTANT:
     # Always monitor the main/root domain.
     subdomains.add(domain)
 
-    return sorted(subdomains)
+    return sorted(subdomains), discovery_error
 
 
 # ============================================================
