@@ -94,7 +94,7 @@ def index():
 @signal_monitor_bp.route("/api/signals")
 def api_signals():
     wifis = core.AdvancedWifiScanner.scan_all_nearby_wifis()
-    return jsonify({"wifis": wifis})
+    return jsonify({"wifis": wifis, "environment": core.scanning_environment_status()})
 
 
 @signal_monitor_bp.route("/api/devices")
@@ -107,7 +107,7 @@ def api_devices():
         _cache.update(devices, alerts, local_ip, subnet)
         _netstore.save(core.get_current_connected_ssid(), devices)
 
-    return jsonify(_cache.snapshot())
+    return jsonify({**_cache.snapshot(), "environment": core.scanning_environment_status()})
 
 
 @signal_monitor_bp.route("/api/networks")
@@ -140,10 +140,11 @@ def api_networks():
             "last_scanned": last_scanned,
         })
 
-    return jsonify({
+  return jsonify({
         "networks": networks,
         "current_ssid": current_ssid,
         "scanned_at": datetime.now().isoformat(timespec="seconds"),
+        "environment": core.scanning_environment_status(),
     })
 
 
