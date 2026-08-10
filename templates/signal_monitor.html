@@ -191,6 +191,7 @@
   <h1>📡 SignalWatch Pro <span style="font-weight:400;color:var(--muted);font-size:13px;">— Wi-Fi &amp; Network Monitor</span></h1>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
     <div class="status" id="statusBar"><span class="dot pulse"></span>connecting…</div>
+    <div class="status" id="envBanner" style="display:none;background:rgba(200,121,26,.12);border:1px solid var(--warn);color:var(--warn);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px;"></div>
     <button class="help-btn" onclick="openHelp()">❓ Help</button>
   </div>
 </header>
@@ -445,6 +446,29 @@ function renderNetworkList(){
     wrap.innerHTML = '<div class="empty-state">No Wi-Fi networks detected yet.</div>';
     return;
   }
+
+  async function loadNetworks(){
+  const data = await fetchJSON('/api/networks');
+  allNetworks = data.networks || [];
+  currentSsid = data.current_ssid;
+  renderNetworkList();
+
+  const banner = document.getElementById('envBanner');
+  if(data.environment && data.environment.available === false){
+    banner.textContent = '⚠ ' + data.environment.reason;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  // Auto-select the connected network the first time we get data.
+  if(!selectedSsid){
+    const connectedNet = allNetworks.find(n => n.connected);
+    if(connectedNet){
+      selectNetwork(connectedNet.ssid);
+    }
+  }
+}
 
   let html = '';
   for(const n of allNetworks){
