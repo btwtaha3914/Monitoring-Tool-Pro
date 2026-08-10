@@ -140,7 +140,7 @@ def api_networks():
             "last_scanned": last_scanned,
         })
 
-  return jsonify({
+    return jsonify({
         "networks": networks,
         "current_ssid": current_ssid,
         "scanned_at": datetime.now().isoformat(timespec="seconds"),
