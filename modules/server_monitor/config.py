@@ -75,7 +75,10 @@ CT_MAX_RESULTS_PER_SEED = 100  # cap rows pulled back per CT query
 MAX_CANDIDATE_DOMAINS = 200  # overall cap on candidate domains per server
 
 # ---- Paths ----------------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if os.environ.get("VERCEL"):
+    BASE_DIR = "/tmp/monitor_suite_server_monitor"
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 EXPORTS_DIR = os.path.join(BASE_DIR, "exports")
