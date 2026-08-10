@@ -272,11 +272,33 @@ def run_command(args, timeout=5):
 def scanning_environment_status():
     """
     Reports whether this process can actually perform live Wi-Fi / LAN
-    scanning on the host it's running on. Cloud/serverless hosts (like
-    Vercel) have none of the required OS tools and aren't on your local
-    network anyway, so scans there will always come back empty -- this
-    lets the frontend explain why instead of just showing nothing.
+    scanning on the host it's running on. Checking for OS tools alone
+    isn't reliable -- some cloud/container images ship a binary like
+    nmcli without any real wireless hardware behind it, which let this
+    check pass incorrectly on Vercel. This checks for an actual
+    wireless network interface first, which cloud hosts never have.
     """
+    if platform.system() == "Linux":
+        has_wifi_hw = False
+        try:
+            for iface in os.listdir("/sys/class/net"):
+                if os.path.exists(os.path.join("/sys/class/net", iface, "wireless")):
+                    has_wifi_hw = True
+                    break
+        except OSError:
+            has_wifi_hw = False
+
+        if not has_wifi_hw:
+            return {
+                "available": False,
+                "reason": (
+                    "No wireless network interface was found on this server "
+                    "(expected on cloud hosts like Vercel, which have no "
+                    "Wi-Fi hardware). Run this app on your own machine to "
+                    "see real results."
+                ),
+            }
+
     if platform.system() == "Windows":
         wifi_tools = ["netsh"]
     elif platform.system() == "Darwin":
@@ -296,7 +318,7 @@ def scanning_environment_status():
             "machine to see real results."
         ),
     }
-
+  
 # ============================================================
 # Native Windows WlanScan API Integration
 # ============================================================
