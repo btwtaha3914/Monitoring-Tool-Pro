@@ -30,11 +30,12 @@ def monitor(domain):
     domain = domain.replace("https://", "").replace("http://", "")
     domain = domain.rstrip("/")
 
-    domains = discover_subdomains(domain)
+    domains, discovery_error = discover_subdomains(domain)
     results = asyncio.run(check_all_domains(domains))
 
     return jsonify({
         "root_domain": domain,
         "total_targets": len(domains),
         "results": results,
+        "subdomain_discovery_error": discovery_error,
     })
