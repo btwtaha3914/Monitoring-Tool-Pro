@@ -6,3 +6,4 @@ cryptography==43.0.1
 psutil==6.0.0
 rarfile==4.2
 gunicorn==22.0.0
+ping3==4.0.8
