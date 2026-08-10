@@ -136,7 +136,10 @@ logger = logging.getLogger("signalwatch")
 # ============================================================
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.abspath(os.path.join(APP_DIR, "..", "..", "data"))
+if os.environ.get("VERCEL"):
+    DATA_DIR = "/tmp/monitor_suite_data"
+else:
+    DATA_DIR = os.path.abspath(os.path.join(APP_DIR, "..", "..", "data"))
 os.makedirs(DATA_DIR, exist_ok=True)
 DB_PATH = os.path.join(DATA_DIR, "signalwatch_history.db")
 EXPORT_PATH = os.path.join(DATA_DIR, "latest_devices_export.csv")
