@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Server Monitor Dashboard</title>
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f7fb;
+
+            color: #1f2937;
+
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+
+            background: #111827;
+
+            color: white;
+
+            padding: 22px 40px;
+
+        }
+
+
+        header h1 {
+
+            font-size: 25px;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        header p {
+
+            color: #9ca3af;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =====================================================
+           MAIN CONTAINER
+        ===================================================== */
+
+        .container {
+
+            width: 95%;
+
+            max-width: 1400px;
+
+            margin: 30px auto;
+
+        }
+
+
+        /* =====================================================
+           SEARCH SECTION
+        ===================================================== */
+
+        .search-box {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .search-box input {
+
+            flex: 1;
+
+            padding: 13px 15px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            outline: none;
+
+        }
+
+
+        .search-box input:focus {
+
+            border-color: #2563eb;
+
+        }
+
+
+        .search-box button {
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 13px 25px;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+        }
+
+
+        .search-box button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+        .search-box button:disabled {
+
+            background: #9ca3af;
+
+            cursor: not-allowed;
+
+        }
+
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .card {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+        }
+
+
+        .card-title {
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .card-value {
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+        }
+
+
+        .card.total .card-value {
+
+            color: #374151;
+
+        }
+
+
+        .card.up .card-value {
+
+            color: #16a34a;
+
+        }
+
+
+        .card.down .card-value {
+
+            color: #dc2626;
+
+        }
+
+
+        .card.degraded .card-value {
+
+            color: #d97706;
+
+        }
+
+
+        /* =====================================================
+           MONITOR INFORMATION
+        ===================================================== */
+
+        .monitor-info {
+
+            display: none;
+
+            background: white;
+
+            padding: 18px 22px;
+
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+        }
+
+
+        .monitor-info.active {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+
+        .root-domain {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+        }
+
+
+        .last-check {
+
+            color: #6b7280;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =====================================================
+           TABLE
+        ===================================================== */
+
+        .table-container {
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+            overflow-x: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1000px;
+
+        }
+
+
+        th {
+
+            background: #f9fafb;
+
+            color: #6b7280;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+        }
+
+
+        td {
+
+            padding: 15px;
+
+            border-bottom:
+                1px solid #f0f0f0;
+
+            font-size: 14px;
+
+        }
+
+
+        tbody tr:hover {
+
+            background: #f9fafb;
+
+        }
+
+
+        .domain-name {
+
+            font-weight: 600;
+
+            color: #111827;
+
+        }
+
+
+        .ip {
+
+            color: #6b7280;
+
+            font-family: monospace;
+
+        }
+
+
+        /* =====================================================
+           STATUS BADGES
+        ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+        }
+
+
+        .status-up {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+        .status-down {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
+        }
+
+
+        .status-degraded {
+
+            background: #fef3c7;
+
+            color: #92400e;
+
+        }
+
+
+        .status-unknown {
+
+            background: #e5e7eb;
+
+            color: #374151;
+
+        }
+
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+        .loading {
+
+            text-align: center;
+
+            padding: 45px;
+
+            color: #6b7280;
+
+        }
+
+
+        .spinner {
+
+            width: 25px;
+
+            height: 25px;
+
+            border: 3px solid #e5e7eb;
+
+            border-top:
+                3px solid #2563eb;
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.8s linear infinite;
+
+            margin: 0 auto 12px;
+
+        }
+
+
+        @keyframes spin {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error {
+
+            text-align: center;
+
+            padding: 40px;
+
+            color: #dc2626;
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .cards {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+            .search-box {
+
+                flex-direction: column;
+
+            }
+
+            .search-box button {
+
+                width: 100%;
+
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .cards {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            header {
+
+                padding: 20px;
+
+            }
+
+            .container {
+
+                width: 92%;
+
+            }
+
+        }
+
+        /* =====================================================
+           HELP BUTTON + MODAL
+        ===================================================== */
+
+        header .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .help-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .12s;
+        }
+
+        .help-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,20,35,.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+
+        .help-overlay.show {
+            display: flex;
+        }
+
+        .help-modal {
+            background: #fff;
+            color: #1f2937;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
+
+        .help-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .help-modal-head h3 {
+            font-size: 17px;
+            margin: 0;
+        }
+
+        .help-modal-head button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .help-modal-body {
+            padding: 20px 22px;
+            overflow-y: auto;
+        }
+
+        .help-modal-body h4 {
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6b7280;
+            margin: 18px 0 8px;
+        }
+
+        .help-modal-body h4:first-child {
+            margin-top: 0;
+        }
+
+        .help-modal-body p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #374151;
+            margin: 0 0 6px;
+        }
+
+        .help-term-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-term-list li {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #374151;
+            padding: 6px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .help-term-list li:last-child {
+            border-bottom: none;
+        }
+
+        .help-term-list b {
+            color: #111827;
+        }
+    </style>
+
+</head>
+
+
+<body>
+<style>
+  :root{
+    --msuite-accent:#2563eb; --msuite-accent-dark:#1d4ed8; --msuite-bg:#ffffff;
+    --msuite-border:#e5e7eb; --msuite-text:#111827; --msuite-dim:#6b7280;
+  }
+  .msnav{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--msuite-bg); border-bottom:1px solid var(--msuite-border);
+    padding:10px 22px; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    position:sticky; top:0; z-index:1000; box-shadow:0 1px 3px rgba(16,24,40,.04);
+  }
+  .msnav-brand{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--msuite-text); text-decoration:none; }
+  .msnav-brand .dot{ width:9px; height:9px; border-radius:50%; background:var(--msuite-accent); box-shadow:0 0 0 4px rgba(37,99,235,.15); }
+  .msnav-links{ display:flex; gap:4px; }
+  .msnav-links a{
+    text-decoration:none; color:var(--msuite-dim); font-size:13.5px; font-weight:600;
+    padding:7px 13px; border-radius:8px; transition:all .12s;
+  }
+  .msnav-links a:hover{ background:#f3f4f6; color:var(--msuite-text); }
+  .msnav-links a.active{ background:#eff4ff; color:var(--msuite-accent-dark); }
+  .msnav-right{ display:flex; align-items:center; gap:12px; }
+  .msnav-user{
+    font-size:12.5px; color:var(--msuite-dim); background:#f9fafb; border:1px solid var(--msuite-border);
+    padding:5px 11px; border-radius:20px; font-weight:600;
+  }
+  .msnav-user b{ color:var(--msuite-text); }
+  .msnav-logout{
+    font-size:12.5px; font-weight:700; color:#dc2626; text-decoration:none;
+    border:1px solid #fecaca; background:#fef2f2; padding:6px 12px; border-radius:8px; transition:.12s;
+  }
+  .msnav-logout:hover{ background:#fee2e2; }
+  @media (max-width:760px){
+    .msnav-links a span.full{ display:none; }
+    .msnav{ padding:10px 12px; }
+  }
+</style>
+<nav class="msnav">
+  <a class="msnav-brand" href="/dashboard">
+    <span class="dot"></span> Monitor&nbsp;Suite
+  </a>
+  <div class="msnav-links">
+    <a href="/dashboard">🏠 <span class="full">Dashboard</span></a>
+    <a href="/web-monitor/" class="active">🌐 <span class="full">Web Monitor</span></a>
+    <a href="/signal-monitor/" class="">📶 <span class="full">Signal Monitor</span></a>
+    <a href="/server-monitor/" class="">🖥️ <span class="full">Server Monitor</span></a>
+  </div>
+  <div class="msnav-right">
+    <span class="msnav-user">👤 <b>Account</b></span>
+    <a class="msnav-logout" href="/logout">Logout</a>
+  </div>
+</nav>
+
+
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+  <div class="header-top">
+    <div>
+        <h1>
+            Server Monitoring Dashboard
+        </h1>
+
+        <p>
+            Monitor domains, servers and subdomains
+            in real time
+        </p>
+    </div>
+
+    <button class="help-btn" onclick="openHelp()">❓ Help</button>
+  </div>
+
+</header>
+
+<!-- =========================================================
+     HELP MODAL
+========================================================= -->
+
+<div class="help-overlay" id="helpOverlay" onclick="if(event.target===this) closeHelp()">
+  <div class="help-modal">
+    <div class="help-modal-head">
+      <h3>🌐 About Web Monitor</h3>
+      <button onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-modal-body">
+      <p>Web Monitor checks whether a website and its subdomains are up, how fast they respond, and whether their SSL certificate is healthy. Enter a root domain (e.g. <code>example.com</code>) and it automatically discovers subdomains via certificate transparency logs, then checks each one.</p>
+
+      <h4>Buttons</h4>
+      <ul class="help-term-list">
+        <li><b>Check Domain</b> — starts a scan: discovers subdomains for the domain you typed, then runs a live HTTP/DNS/SSL check against every one of them.</li>
+      </ul>
+
+      <h4>Summary cards</h4>
+      <ul class="help-term-list">
+        <li><b>Total Targets</b> — how many domains/subdomains were found and checked.</li>
+        <li><b>Websites UP</b> — targets that responded successfully.</li>
+        <li><b>Websites DOWN</b> — targets that failed to respond (timeout, connection refused, DNS failure, etc.).</li>
+        <li><b>Degraded</b> — targets that responded, but slowly or with a warning-level issue (e.g. a redirect or an expiring certificate).</li>
+      </ul>
+
+      <h4>Results table columns</h4>
+      <ul class="help-term-list">
+        <li><b>Domain</b> — the domain or subdomain checked.</li>
+        <li><b>IP Address</b> — the IP it resolved to.</li>
+        <li><b>DNS</b> — whether the domain name resolved successfully.</li>
+        <li><b>Server</b> — whether the server accepted a connection on a common port (80/443).</li>
+        <li><b>Website</b> — whether an HTTP response was received.</li>
+        <li><b>HTTP</b> — the HTTP status code returned (e.g. 200, 404, 500).</li>
+        <li><b>Response</b> — how long the server took to respond, in milliseconds.</li>
+        <li><b>Diagnosis</b> — a plain-language summary of what's wrong, if anything.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<div class="container">
+
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
+    <div class="search-box">
+
+        <input
+            id="domainInput"
+            type="text"
+            placeholder="Enter domain e.g. example.com"
+            autocomplete="off"
+        >
+
+        <button
+            id="checkButton"
+            onclick="startMonitoring()"
+        >
+            Check Domain
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONITOR INFORMATION
+    ====================================================== -->
+
+    <div
+        class="monitor-info"
+        id="monitorInfo"
+    >
+
+        <div>
+
+            <div
+                class="root-domain"
+                id="rootDomain"
+            >
+                -
+            </div>
+
+            <div class="last-check">
+
+                Last checked:
+                <span id="lastCheck">
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div>
+
+            <span id="targetCount">
+                0 targets
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="cards">
+
+
+        <div class="card total">
+
+            <div class="card-title">
+                Total Targets
+            </div>
+
+            <div
+                class="card-value"
+                id="totalTargets"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card up">
+
+            <div class="card-title">
+                Websites UP
+            </div>
+
+            <div
+                class="card-value"
+                id="upTargets"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card down">
+
+            <div class="card-title">
+                Websites DOWN
+            </div>
+
+            <div
+                class="card-value"
+                id="downTargets"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card degraded">
+
+            <div class="card-title">
+                Degraded
+            </div>
+
+            <div
+                class="card-value"
+                id="degradedTargets"
+            >
+                0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         RESULTS TABLE
+    ====================================================== -->
+
+    <div class="table-container">
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Domain
+                    </th>
+
+                    <th>
+                        IP Address
+                    </th>
+
+                    <th>
+                        DNS
+                    </th>
+
+                    <th>
+                        Server
+                    </th>
+
+                    <th>
+                        Website
+                    </th>
+
+                    <th>
+                        HTTP
+                    </th>
+
+                    <th>
+                        Response
+                    </th>
+
+                    <th>
+                        Diagnosis
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="resultsBody">
+
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="loading"
+                    >
+
+                        Enter a domain above
+                        to start monitoring.
+
+                    </td>
+
+                </tr>
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+
+// ============================================================
+// HELP MODAL
+// ============================================================
+
+function openHelp() {
+    document.getElementById("helpOverlay").classList.add("show");
+}
+
+function closeHelp() {
+    document.getElementById("helpOverlay").classList.remove("show");
+}
+
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeHelp();
+});
+
+
+// ============================================================
+// START MONITORING
+// ============================================================
+
+async function startMonitoring() {
+
+
+    const input =
+        document.getElementById(
+            "domainInput"
+        );
+
+
+    const button =
+        document.getElementById(
+            "checkButton"
+        );
+
+
+    const resultsBody =
+        document.getElementById(
+            "resultsBody"
+        );
+
+
+    let domain =
+        input.value.trim()
+            .toLowerCase();
+
+
+    // --------------------------------------------------------
+    // VALIDATE INPUT
+    // --------------------------------------------------------
+
+    if (!domain) {
+
+        alert(
+            "Please enter a domain name."
+        );
+
+        return;
+
+    }
+
+
+    // Remove protocol
+
+    domain =
+        domain.replace(
+            "https://",
+            ""
+        );
+
+
+    domain =
+        domain.replace(
+            "http://",
+            ""
+        );
+
+
+    // Remove trailing slash
+
+    domain =
+        domain.replace(
+            /\/+$/,
+            ""
+        );
+
+
+    // --------------------------------------------------------
+    // LOADING STATE
+    // --------------------------------------------------------
+
+    button.disabled = true;
+
+    button.textContent =
+        "Checking...";
+
+
+    resultsBody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="8"
+                class="loading"
+            >
+
+                <div class="spinner"></div>
+
+                Discovering subdomains
+                and checking servers...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+
+        // ====================================================
+        // CALL FLASK BACKEND
+        // ====================================================
+
+        const response =
+            await fetch(
+                `/web-monitor/monitor/${encodeURIComponent(domain)}`
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server returned HTTP ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        // ====================================================
+        // DISPLAY DATA
+        // ====================================================
+
+        displayResults(
+            data
+        );
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(
+            "Monitoring error:",
+            error
+        );
+
+
+        resultsBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="error"
+                >
+
+                    ❌ Unable to connect
+                    to monitoring server.
+
+                    <br><br>
+
+                    <small>
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </small>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+    finally {
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Check Domain";
+
+    }
+
+}
+
+
+// ============================================================
+// DISPLAY RESULTS
+// ============================================================
+
+function displayResults(data) {
+
+
+    const results =
+        data.results || [];
+
+
+    const resultsBody =
+        document.getElementById(
+            "resultsBody"
+        );
+
+
+    // --------------------------------------------------------
+    // UPDATE MONITOR INFORMATION
+    // --------------------------------------------------------
+
+    document.getElementById(
+        "monitorInfo"
+    ).classList.add(
+        "active"
+    );
+
+
+    document.getElementById(
+        "rootDomain"
+    ).textContent =
+        data.root_domain || "-";
+
+
+    document.getElementById(
+        "targetCount"
+    ).textContent =
+        `${results.length} target(s)`;
+
+
+    document.getElementById(
+        "lastCheck"
+    ).textContent =
+        new Date().toLocaleTimeString();
+
+
+    // --------------------------------------------------------
+    // RESET SUMMARY
+    // --------------------------------------------------------
+
+    let up = 0;
+
+    let down = 0;
+
+    let degraded = 0;
+
+
+    // --------------------------------------------------------
+    // EMPTY RESULT
+    // --------------------------------------------------------
+
+    if (results.length === 0) {
+
+        resultsBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="loading"
+                >
+
+                    No monitoring targets found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        updateSummary(
+            0,
+            0,
+            0,
+            0
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // CLEAR TABLE
+    // --------------------------------------------------------
+
+    resultsBody.innerHTML = "";
+
+
+    // --------------------------------------------------------
+    // ADD RESULTS
+    // --------------------------------------------------------
+
+    results.forEach(
+        result => {
+
+
+            const status =
+                result.overall_status;
+
+
+            // Count status
+
+            if (
+                status === "UP"
+            ) {
+
+                up++;
+
+            }
+
+            else if (
+                status === "DEGRADED"
+            ) {
+
+                degraded++;
+
+            }
+
+            else {
+
+                down++;
+
+            }
+
+
+            // Create row
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+
+                    <span
+                        class="domain-name"
+                    >
+
+                        ${escapeHtml(
+                            result.domain
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="ip"
+                    >
+
+                        ${escapeHtml(
+                            result.ip || "N/A"
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    ${statusBadge(
+                        result.dns_status
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${statusBadge(
+                        result.server_status
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${statusBadge(
+                        result.website_status
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${
+                        result.http_status
+                        || "N/A"
+                    }
+
+                </td>
+
+
+                <td>
+
+                    ${
+                        result.response_time !== null
+                        &&
+                        result.response_time !== undefined
+
+                        ? result.response_time + " ms"
+
+                        : "N/A"
+                    }
+
+                </td>
+
+
+                <td>
+
+                    ${statusBadge(
+                        status
+                    )}
+
+                </td>
+
+            `;
+
+
+            resultsBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    // --------------------------------------------------------
+    // UPDATE SUMMARY
+    // --------------------------------------------------------
+
+    updateSummary(
+        results.length,
+        up,
+        down,
+        degraded
+    );
+
+}
+
+
+// ============================================================
+// UPDATE SUMMARY CARDS
+// ============================================================
+
+function updateSummary(
+    total,
+    up,
+    down,
+    degraded
+) {
+
+
+    document.getElementById(
+        "totalTargets"
+    ).textContent =
+        total;
+
+
+    document.getElementById(
+        "upTargets"
+    ).textContent =
+        up;
+
+
+    document.getElementById(
+        "downTargets"
+    ).textContent =
+        down;
+
+
+    document.getElementById(
+        "degradedTargets"
+    ).textContent =
+        degraded;
+
+}
+
+
+// ============================================================
+// CREATE STATUS BADGE
+// ============================================================
+
+function statusBadge(status) {
+
+
+    if (!status) {
+
+        return `
+            <span
+                class="status status-unknown"
+            >
+                UNKNOWN
+            </span>
+        `;
+
+    }
+
+
+    let className =
+        "status-unknown";
+
+
+    let displayText =
+        status;
+
+
+    // --------------------------------------------------------
+    // UP
+    // --------------------------------------------------------
+
+    if (
+        status === "UP" ||
+        status === "REACHABLE_VIA_HTTP"
+    ) {
+
+        className =
+            "status-up";
+
+    }
+
+
+    // --------------------------------------------------------
+    // DEGRADED
+    // --------------------------------------------------------
+
+    else if (
+        status === "DEGRADED"
+    ) {
+
+        className =
+            "status-degraded";
+
+    }
+
+
+    // --------------------------------------------------------
+    // DOWN
+    // --------------------------------------------------------
+
+    else if (
+
+        status === "DOWN" ||
+
+        status === "WEBSITE_DOWN" ||
+
+        status === "SERVER_DOWN" ||
+
+        status === "DNS_FAILED"
+
+    ) {
+
+        className =
+            "status-down";
+
+    }
+
+
+    return `
+
+        <span
+            class="status ${className}"
+        >
+
+            ${escapeHtml(
+                displayText
+            )}
+
+        </span>
+
+    `;
+
+}
+
+
+// ============================================================
+// HTML ESCAPE
+// ============================================================
+
+function escapeHtml(value) {
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        String(value);
+
+
+    return div.innerHTML;
+
+}
+
+
+// ============================================================
+// ENTER KEY SUPPORT
+// ============================================================
+
+document
+    .getElementById(
+        "domainInput"
+    )
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                startMonitoring();
+
+            }
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>

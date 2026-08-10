@@ -1,0 +1,51 @@
+<style>
+  :root{
+    --msuite-accent:#2563eb; --msuite-accent-dark:#1d4ed8; --msuite-bg:#ffffff;
+    --msuite-border:#e5e7eb; --msuite-text:#111827; --msuite-dim:#6b7280;
+  }
+  .msnav{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--msuite-bg); border-bottom:1px solid var(--msuite-border);
+    padding:10px 22px; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    position:sticky; top:0; z-index:1000; box-shadow:0 1px 3px rgba(16,24,40,.04);
+  }
+  .msnav-brand{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; color:var(--msuite-text); text-decoration:none; }
+  .msnav-brand .dot{ width:9px; height:9px; border-radius:50%; background:var(--msuite-accent); box-shadow:0 0 0 4px rgba(37,99,235,.15); }
+  .msnav-links{ display:flex; gap:4px; }
+  .msnav-links a{
+    text-decoration:none; color:var(--msuite-dim); font-size:13.5px; font-weight:600;
+    padding:7px 13px; border-radius:8px; transition:all .12s;
+  }
+  .msnav-links a:hover{ background:#f3f4f6; color:var(--msuite-text); }
+  .msnav-links a.active{ background:#eff4ff; color:var(--msuite-accent-dark); }
+  .msnav-right{ display:flex; align-items:center; gap:12px; }
+  .msnav-user{
+    font-size:12.5px; color:var(--msuite-dim); background:#f9fafb; border:1px solid var(--msuite-border);
+    padding:5px 11px; border-radius:20px; font-weight:600;
+  }
+  .msnav-user b{ color:var(--msuite-text); }
+  .msnav-logout{
+    font-size:12.5px; font-weight:700; color:#dc2626; text-decoration:none;
+    border:1px solid #fecaca; background:#fef2f2; padding:6px 12px; border-radius:8px; transition:.12s;
+  }
+  .msnav-logout:hover{ background:#fee2e2; }
+  @media (max-width:760px){
+    .msnav-links a span.full{ display:none; }
+    .msnav{ padding:10px 12px; }
+  }
+</style>
+<nav class="msnav">
+  <a class="msnav-brand" href="{{ url_for('dashboard') }}">
+    <span class="dot"></span> Monitor&nbsp;Suite
+  </a>
+  <div class="msnav-links">
+    <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active=='dashboard' else '' }}">🏠 <span class="full">Dashboard</span></a>
+    <a href="{{ url_for('web_monitor.index') }}" class="{{ 'active' if active=='web' else '' }}">🌐 <span class="full">Web Monitor</span></a>
+    <a href="{{ url_for('signal_monitor.index') }}" class="{{ 'active' if active=='signal' else '' }}">📶 <span class="full">Signal Monitor</span></a>
+    <a href="{{ url_for('server_monitor.console') }}" class="{{ 'active' if active=='server' else '' }}">🖥️ <span class="full">Server Monitor</span></a>
+  </div>
+  <div class="msnav-right">
+    <span class="msnav-user">👤 <b>{{ session.get('user', 'Guest') }}</b></span>
+    <a class="msnav-logout" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</nav>
