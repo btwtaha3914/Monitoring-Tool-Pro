@@ -5,7 +5,15 @@ Not meant as an enterprise auth system -- just enough real, working
 sign-up / sign-in so the app has a genuine login gate in front of the
 three monitoring tools, plus a "Continue as guest" path. Passwords are
 hashed (never stored in plain text) and kept in a small JSON file on
-disk.
+disk when the filesystem is writable.
+
+On read-only-filesystem hosts (e.g. Vercel serverless, where only /tmp
+is writable and nothing written there survives past the request), this
+transparently falls back to an in-memory store for that invocation
+instead of crashing sign-up with a 500. Accounts created that way won't
+persist between requests on such hosts -- "Continue as guest" is the
+reliable option there. On a normal always-on host (Render, your own
+machine, etc.) this behaves exactly as a plain JSON file store.
 """
 
 import json
@@ -20,12 +28,33 @@ _LOCK = threading.Lock()
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 _USERS_FILE = os.path.join(_DATA_DIR, "users.json")
 
-os.makedirs(_DATA_DIR, exist_ok=True)
-
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+# Set once we detect the real data dir isn't writable (e.g. Vercel's
+# read-only filesystem). When True, we keep users in this process-local
+# dict instead of touching disk at all.
+_FILESYSTEM_WRITABLE = True
+_MEMORY_USERS: dict = {}
+
+
+def _ensure_data_dir():
+    global _FILESYSTEM_WRITABLE
+    try:
+        os.makedirs(_DATA_DIR, exist_ok=True)
+        probe = os.path.join(_DATA_DIR, ".write_probe")
+        with open(probe, "w") as f:
+            f.write("ok")
+        os.remove(probe)
+    except OSError:
+        _FILESYSTEM_WRITABLE = False
+
+
+_ensure_data_dir()
 
 
 def _load():
+    if not _FILESYSTEM_WRITABLE:
+        return dict(_MEMORY_USERS)
     if not os.path.exists(_USERS_FILE):
         return {}
     try:
@@ -36,10 +65,23 @@ def _load():
 
 
 def _save(users):
-    tmp_path = _USERS_FILE + ".tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        json.dump(users, f, indent=2)
-    os.replace(tmp_path, _USERS_FILE)
+    global _FILESYSTEM_WRITABLE
+    if not _FILESYSTEM_WRITABLE:
+        _MEMORY_USERS.clear()
+        _MEMORY_USERS.update(users)
+        return
+    try:
+        tmp_path = _USERS_FILE + ".tmp"
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(users, f, indent=2)
+        os.replace(tmp_path, _USERS_FILE)
+    except OSError:
+        # Disk turned out not to be writable after all (e.g. detected
+        # mid-request on a host with unusual permissions) -- fall back
+        # to memory for the rest of this process rather than 500ing.
+        _FILESYSTEM_WRITABLE = False
+        _MEMORY_USERS.clear()
+        _MEMORY_USERS.update(users)
 
 
 def create_user(username, email, password):
