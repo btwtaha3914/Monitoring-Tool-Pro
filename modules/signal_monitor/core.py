@@ -269,6 +269,33 @@ def run_command(args, timeout=5):
         logger.exception("Command failed: %s", " ".join(args))
         return False, ""
 
+def scanning_environment_status():
+    """
+    Reports whether this process can actually perform live Wi-Fi / LAN
+    scanning on the host it's running on. Cloud/serverless hosts (like
+    Vercel) have none of the required OS tools and aren't on your local
+    network anyway, so scans there will always come back empty -- this
+    lets the frontend explain why instead of just showing nothing.
+    """
+    if platform.system() == "Windows":
+        wifi_tools = ["netsh"]
+    elif platform.system() == "Darwin":
+        wifi_tools = ["airport", "networksetup"]
+    else:
+        wifi_tools = ["nmcli", "iwlist"]
+
+    wifi_tool_found = any(shutil.which(t) for t in wifi_tools)
+    arp_tool_found = shutil.which("arp") is not None or shutil.which("ip") is not None
+
+    available = wifi_tool_found and arp_tool_found
+    return {
+        "available": available,
+        "reason": None if available else (
+            "This server doesn't have Wi-Fi/network scanning tools available "
+            "(common on cloud hosts like Vercel). Run this app on your own "
+            "machine to see real results."
+        ),
+    }
 
 # ============================================================
 # Native Windows WlanScan API Integration
