@@ -12,7 +12,7 @@ import requests
 
 MAX_CONCURRENT_CHECKS = 10
 REQUEST_TIMEOUT = 100
-SERVER_TIMEOUT = 5
+SERVER_TIMEOUT = 50
 
 
 # ============================================================
