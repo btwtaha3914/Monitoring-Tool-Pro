@@ -25,7 +25,10 @@ from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
 _LOCK = threading.Lock()
-_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+if os.environ.get("VERCEL"):
+    _DATA_DIR = "/tmp/monitor_suite_data"
+else:
+    _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 _USERS_FILE = os.path.join(_DATA_DIR, "users.json")
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
