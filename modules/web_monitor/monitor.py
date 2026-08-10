@@ -11,7 +11,7 @@ import requests
 # ============================================================
 
 MAX_CONCURRENT_CHECKS = 10
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 100
 SERVER_TIMEOUT = 5
 
 
@@ -33,7 +33,7 @@ def discover_subdomains(domain):
 
         response = requests.get(
             url,
-            timeout=15,
+            timeout=150,
             headers={"User-Agent": "Mozilla/5.0 (monitoring-tool)"},
         )
 
