@@ -1,0 +1,2529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Web Monitor Dashboard</title>
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f7fb;
+
+            color: #1f2937;
+
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+
+            background: #111827;
+
+            color: white;
+
+            padding: 22px 40px;
+
+        }
+
+
+        header h1 {
+
+            font-size: 25px;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        header p {
+
+            color: #9ca3af;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =====================================================
+           MAIN CONTAINER
+        ===================================================== */
+
+        .container {
+
+            width: 95%;
+
+            max-width: 1400px;
+
+            margin: 30px auto;
+
+        }
+
+
+        /* =====================================================
+           SEARCH SECTION
+        ===================================================== */
+
+        .search-box {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .search-box input {
+
+            flex: 1;
+
+            padding: 13px 15px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            outline: none;
+
+        }
+
+
+        .search-box input:focus {
+
+            border-color: #2563eb;
+
+        }
+
+
+        .search-box button {
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 13px 25px;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+        }
+
+
+        .search-box button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+        .search-box button:disabled {
+
+            background: #9ca3af;
+
+            cursor: not-allowed;
+
+        }
+
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .card {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+            position: relative;
+
+        }
+
+
+        .card-title {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+            min-height: 20px;
+        }
+
+
+        .card-value {
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+        }
+
+
+        .card.total .card-value {
+
+            color: #374151;
+
+        }
+
+
+        .card.up .card-value {
+
+            color: #16a34a;
+
+        }
+
+
+        .card.down .card-value {
+
+            color: #dc2626;
+
+        }
+
+
+        .card.degraded .card-value {
+
+            color: #d97706;
+
+        }
+
+
+        /* =====================================================
+           MONITOR INFORMATION
+        ===================================================== */
+
+        .monitor-info {
+
+            display: none;
+
+            background: white;
+
+            padding: 18px 22px;
+
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+        }
+
+
+        .monitor-info.active {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+            gap: 12px;
+
+        }
+
+
+        .root-domain {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+        }
+
+        .monitor-info-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .watchlist-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .12s;
+        }
+
+        .watchlist-btn:hover:not(:disabled) {
+            background: #15803d;
+        }
+
+        .watchlist-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .watchlist-btn.saved {
+            background: #6b7280;
+        }
+
+        /* =====================================================
+           DISCOVERY STATUS BANNER
+        ===================================================== */
+
+        .discovery-banner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 9px 14px;
+            border-radius: 10px;
+            margin: -14px 0 20px;
+        }
+        .discovery-banner.ok {
+            background: rgba(34, 197, 94, .08);
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, .25);
+        }
+        .discovery-banner.warn {
+            background: rgba(234, 179, 8, .10);
+            color: #92610a;
+            border: 1px solid rgba(234, 179, 8, .35);
+        }
+
+        /* =====================================================
+           HELP ICON (top-right corner of card)
+        ===================================================== */
+
+        .mini-help {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            opacity: .75;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 16px;
+            text-align: center;
+            cursor: help;
+            padding: 0;
+            font-family: inherit;
+            transition: opacity .12s, border-color .12s, color .12s;
+        }
+
+        .mini-help:hover {
+            opacity: 1;
+            border-color: #6b7280;
+            color: #111827;
+        }
+
+        .mini-help .tip {
+            display: none;
+            position: absolute;
+            top: 130%;
+            right: 0;
+            left: auto;
+            background: #111827;
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 500;
+            line-height: 1.4;
+            padding: 8px 10px;
+            border-radius: 8px;
+            width: 210px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.18);
+            z-index: 20;
+            text-align: left;
+        }
+
+        .mini-help .tip::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            right: 8px;
+            border: 5px solid transparent;
+            border-bottom-color: #111827;
+        }
+
+        .mini-help:hover .tip,
+        .mini-help:focus .tip {
+            display: block;
+        }
+
+
+        .last-check {
+
+            color: #6b7280;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =====================================================
+           TABLE
+        ===================================================== */
+
+        .table-container {
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.06);
+
+            overflow-x: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1000px;
+
+        }
+
+
+        th {
+
+            background: #f9fafb;
+
+            color: #6b7280;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+        }
+
+
+        td {
+
+            padding: 15px;
+
+            border-bottom:
+                1px solid #f0f0f0;
+
+            font-size: 14px;
+
+        }
+
+
+        tbody tr:hover {
+
+            background: #f9fafb;
+
+        }
+
+
+        .domain-name {
+
+            font-weight: 600;
+
+            color: #111827;
+
+        }
+
+
+        .ip {
+
+            color: #6b7280;
+
+            font-family: monospace;
+
+        }
+
+
+        /* =====================================================
+           STATUS BADGES
+        ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+        }
+
+
+        .status-up {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+        .status-down {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
+        }
+
+
+        .status-degraded {
+
+            background: #fef3c7;
+
+            color: #92400e;
+
+        }
+
+
+        .status-unknown {
+
+            background: #e5e7eb;
+
+            color: #374151;
+
+        }
+
+
+        /* =====================================================
+           PHASE 1.10 — Clickable domain / IP cells
+        ===================================================== */
+
+        .domain-link, .ip-link {
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color .12s, background .12s;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: 4px;
+        }
+
+        .domain-link:hover, .ip-link:hover {
+            background: #eff6ff;
+            text-decoration: underline;
+        }
+
+        .ip-link::after {
+            content: " ↗";
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+        .loading {
+
+            text-align: center;
+
+            padding: 45px;
+
+            color: #6b7280;
+
+        }
+
+        .loading .hint {
+            display: block;
+            margin-top: 10px;
+            font-size: 12.5px;
+            color: #9ca3af;
+        }
+
+
+        .spinner {
+
+            width: 25px;
+
+            height: 25px;
+
+            border: 3px solid #e5e7eb;
+
+            border-top:
+                3px solid #2563eb;
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.8s linear infinite;
+
+            margin: 0 auto 12px;
+
+        }
+
+
+        @keyframes spin {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error {
+
+            text-align: center;
+
+            padding: 40px;
+
+            color: #dc2626;
+
+        }
+
+        /* =====================================================
+           TOAST
+        ===================================================== */
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #111827;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+            z-index: 1500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .25s, transform .25s;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
+
+
+        /* =====================================================
+           HISTORY PANEL
+        ===================================================== */
+
+        .history-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            margin-top: 25px;
+            overflow: hidden;
+        }
+
+        .history-panel-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+        }
+
+        .history-panel-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .history-panel-header .refresh-btn {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            padding: 6px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all .12s;
+        }
+
+        .history-panel-header .refresh-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .history-list {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 14px 22px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: background .12s;
+        }
+
+        .history-item:last-child { border-bottom: none; }
+        .history-item:hover { background: #f9fafb; }
+
+        .history-item-main { flex: 1; min-width: 0; }
+
+        .history-item-domain {
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .history-item-meta {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .history-item-counts {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .history-count {
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .history-count.up { background: #dcfce7; color: #166534; }
+        .history-count.down { background: #fee2e2; color: #991b1b; }
+        .history-count.degraded { background: #fef3c7; color: #92400e; }
+
+        .history-view-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .12s;
+            flex-shrink: 0;
+        }
+
+        .history-view-btn:hover { background: #1d4ed8; }
+
+        .history-empty {
+            padding: 45px 22px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+            .cards { grid-template-columns: repeat(2, 1fr); }
+            .search-box { flex-direction: column; }
+            .search-box button { width: 100%; }
+            .history-item { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 500px) {
+            .cards { grid-template-columns: 1fr; }
+            header { padding: 20px; }
+            .container { width: 92%; }
+        }
+
+        /* =====================================================
+           HELP BUTTON + MODAL
+        ===================================================== */
+
+        header .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .help-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .12s;
+        }
+
+        .help-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,20,35,.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+
+        .help-overlay.show { display: flex; }
+
+        .help-modal {
+            background: #fff;
+            color: #1f2937;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
+
+        .help-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .help-modal-head h3 { font-size: 17px; margin: 0; }
+
+        .help-modal-head button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .help-modal-body {
+            padding: 20px 22px;
+            overflow-y: auto;
+        }
+
+        .help-modal-body h4 {
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6b7280;
+            margin: 18px 0 8px;
+        }
+
+        .help-modal-body h4:first-child { margin-top: 0; }
+
+        .help-modal-body p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #374151;
+            margin: 0 0 6px;
+        }
+
+        .help-term-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-term-list li {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #374151;
+            padding: 6px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .help-term-list li:last-child { border-bottom: none; }
+        .help-term-list b { color: #111827; }
+
+        /* =====================================================
+           SCAN DETAIL MODAL
+        ===================================================== */
+
+        .scan-detail-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .scan-detail-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .scan-detail-summary-item { font-size: 12.5px; }
+
+        .scan-detail-summary-item .lbl {
+            color: #6b7280;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .scan-detail-summary-item .val {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .scan-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        .scan-detail-table th {
+            background: #f9fafb;
+            color: #6b7280;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .scan-detail-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+
+        /* =====================================================
+           PHASE 1.10 — DOMAIN DEEP DETAIL MODAL
+        ===================================================== */
+
+        .detail-modal {
+            background: #fff;
+            color: #1f2937;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 860px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
+
+        .detail-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .detail-modal-head h3 {
+            font-size: 17px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .detail-modal-head .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #6b7280;
+            line-height: 1;
+            padding: 4px 8px;
+        }
+
+        .detail-modal-body {
+            padding: 22px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .detail-section { margin-bottom: 24px; }
+        .detail-section:last-child { margin-bottom: 0; }
+
+        .detail-section-header {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #6b7280;
+            margin: 0 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .detail-overview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .detail-overview-item { font-size: 13px; }
+
+        .detail-overview-item .lbl {
+            display: block;
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .detail-overview-item .val {
+            color: #111827;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .detail-list li {
+            padding: 7px 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 12.5px;
+            color: #111827;
+            word-break: break-all;
+        }
+
+        .detail-list li:last-child { margin-bottom: 0; }
+
+        .detail-list.empty {
+            padding: 10px 14px;
+            background: #f9fafb;
+            border-radius: 6px;
+            color: #9ca3af;
+            font-style: italic;
+            font-size: 12.5px;
+        }
+
+        .detail-kv-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        .detail-kv-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+        }
+
+        .detail-kv-table td:first-child {
+            color: #6b7280;
+            width: 180px;
+            font-weight: 600;
+        }
+
+        .detail-kv-table td:last-child {
+            color: #111827;
+            font-family: "JetBrains Mono", monospace;
+            word-break: break-all;
+        }
+
+        .detail-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        .detail-badge.good { background: #dcfce7; color: #166534; }
+        .detail-badge.warn { background: #fef3c7; color: #92400e; }
+        .detail-badge.bad  { background: #fee2e2; color: #991b1b; }
+
+        .detail-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .detail-error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #dc2626;
+            font-size: 14px;
+        }
+
+        
+/* =====================================================
+   PHASE 1.10.3-4 — Uptime badges + chart container
+===================================================== */
+
+.uptime-badges {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 4px 0 16px;
+}
+
+.uptime-badge {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    text-align: center;
+    position: relative;
+}
+
+.uptime-badge .window {
+    display: block;
+    font-size: 10.5px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.uptime-badge .percent {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: -0.02em;
+}
+
+.uptime-badge .checks {
+    display: block;
+    font-size: 10.5px;
+    color: #9ca3af;
+    margin-top: 5px;
+}
+
+.uptime-badge.excellent .percent { color: #16a34a; }
+.uptime-badge.good      .percent { color: #65a30d; }
+.uptime-badge.fair      .percent { color: #d97706; }
+.uptime-badge.poor      .percent { color: #dc2626; }
+.uptime-badge.unknown   .percent { color: #9ca3af; font-size: 18px; }
+
+.chart-container {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 4px;
+    height: 220px;
+    position: relative;
+}
+
+.chart-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-size: 13px;
+    font-style: italic;
+}
+
+
+/* =====================================================
+   PHASE 1.10.5 — Status timeline (StatusPage-style bar)
+===================================================== */
+
+.status-timeline-wrap {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 4px;
+}
+
+.status-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 11.5px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.status-timeline-header .range {
+    font-family: "JetBrains Mono", monospace;
+    color: #111827;
+}
+
+.status-timeline {
+    display: flex;
+    gap: 2px;
+    height: 32px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.status-segment {
+    flex: 1;
+    min-width: 4px;
+    cursor: pointer;
+    transition: transform .1s, opacity .1s;
+    position: relative;
+}
+
+.status-segment:hover {
+    transform: scaleY(1.15);
+    opacity: 0.85;
+}
+
+.status-segment.up       { background: #16a34a; }
+.status-segment.degraded { background: #d97706; }
+.status-segment.down     { background: #dc2626; }
+.status-segment.unknown  { background: #d1d5db; }
+
+.status-timeline-legend {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.status-timeline-legend .dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: -1px;
+}
+
+.status-timeline-empty {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+    font-size: 12.5px;
+    font-style: italic;
+}
+
+/* Segment tooltip */
+.status-segment-tooltip {
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .12s;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    font-family: "JetBrains Mono", monospace;
+}
+
+.status-segment:hover .status-segment-tooltip {
+    opacity: 1;
+}
+
+    </style>
+
+    <!-- Phase 1.10.3 — Chart.js for response-time graph (from CDN, no install) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+
+
+</head>
+
+
+<body>
+{% include 'partials/navbar.html' %}
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+  <div class="header-top">
+    <div>
+        <h1>Web Monitor Dashboard</h1>
+        <p>Monitor domains, servers and subdomains in real time</p>
+    </div>
+
+    <button class="help-btn" onclick="openHelp()">❓ Help</button>
+  </div>
+
+</header>
+
+<!-- =========================================================
+     HELP MODAL
+========================================================= -->
+
+<div class="help-overlay" id="helpOverlay" onclick="if(event.target===this) closeHelp()">
+  <div class="help-modal">
+    <div class="help-modal-head">
+      <h3>🌐 About Web Monitor</h3>
+      <button onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-modal-body">
+      <p>Web Monitor checks whether a website and its subdomains are up, how fast they respond, and whether their SSL certificate is healthy. Enter a root domain (e.g. <code>example.com</code>) and it automatically discovers subdomains, then checks each one live.</p>
+
+      <h4>Buttons</h4>
+      <ul class="help-term-list">
+        <li><b>Check Domain</b> — starts a live scan.</li>
+        <li><b>Save to Watchlist</b> — saves the root domain for future reference.</li>
+        <li><b>View</b> (in History) — reopens a past scan with all its results.</li>
+        <li><b>Click a subdomain</b> — opens a deep analysis modal (DNS/HTTP/SSL details).</li>
+        <li><b>Click an IP address</b> — jumps to Server Monitor with the IP pre-filled and lookup auto-running.</li>
+      </ul>
+
+      <h4>Summary cards</h4>
+      <ul class="help-term-list">
+        <li><b>Total Targets</b> — how many domains/subdomains were checked.</li>
+        <li><b>Websites UP</b> — targets that responded successfully.</li>
+        <li><b>Websites DOWN</b> — targets that failed to respond.</li>
+        <li><b>Degraded</b> — targets that responded with a warning (e.g. HTTP 4xx).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     SCAN DETAIL MODAL
+========================================================= -->
+
+<div class="help-overlay" id="scanDetailOverlay" onclick="if(event.target===this) closeScanDetail()">
+  <div class="help-modal" style="max-width: 900px;">
+    <div class="help-modal-head">
+      <h3 id="scanDetailTitle">📊 Scan Details</h3>
+      <button onclick="closeScanDetail()">✕</button>
+    </div>
+    <div class="help-modal-body scan-detail-body" id="scanDetailBody">
+      Loading...
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     PHASE 1.10 — DOMAIN DEEP DETAIL MODAL
+========================================================= -->
+
+<div class="help-overlay" id="domainDetailOverlay"
+     onclick="if(event.target===this) closeDomainDetail()">
+  <div class="detail-modal">
+    <div class="detail-modal-head">
+      <h3 id="domainDetailTitle">🔍 Domain Details</h3>
+      <button class="close-btn" onclick="closeDomainDetail()">✕</button>
+    </div>
+    <div class="detail-modal-body" id="domainDetailBody">
+      <div class="detail-loading">
+        <div class="spinner"></div>
+        Loading domain details...
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<div class="container">
+
+    <div class="search-box">
+        <input id="domainInput" type="text" placeholder="Enter domain e.g. example.com" autocomplete="off">
+        <button id="checkButton" onclick="startMonitoring()">Check Domain</button>
+    </div>
+
+    <div class="monitor-info" id="monitorInfo">
+        <div>
+            <div class="root-domain" id="rootDomain">-</div>
+            <div class="last-check">Last checked: <span id="lastCheck">-</span></div>
+        </div>
+        <div class="monitor-info-right">
+            <span id="targetCount">0 targets</span>
+            <button id="watchlistBtn" class="watchlist-btn" style="display: none;" onclick="saveToWatchlist()">
+                ⭐ Save to Watchlist
+            </button>
+        </div>
+    </div>
+
+    <div class="cards">
+
+        <div class="card total">
+            <div class="card-title">Total Targets</div>
+            <div class="card-value" id="totalTargets">0</div>
+        </div>
+
+        <div class="card up">
+            <div class="card-title">Websites UP</div>
+            <button type="button" class="mini-help" tabindex="0" aria-label="What does Websites UP mean?">
+                ?
+                <span class="tip">The site responded with a healthy HTTP status (200–399).</span>
+            </button>
+            <div class="card-value" id="upTargets">0</div>
+        </div>
+
+        <div class="card down">
+            <div class="card-title">Websites DOWN</div>
+            <button type="button" class="mini-help" tabindex="0" aria-label="What does Websites DOWN mean?">
+                ?
+                <span class="tip">The target failed entirely — DNS didn't resolve, connection refused, or server error (500+).</span>
+            </button>
+            <div class="card-value" id="downTargets">0</div>
+        </div>
+
+        <div class="card degraded">
+            <div class="card-title">Degraded</div>
+            <button type="button" class="mini-help" tabindex="0" aria-label="What does Degraded mean?">
+                ?
+                <span class="tip">The server responded but with a client-error status (400–499).</span>
+            </button>
+            <div class="card-value" id="degradedTargets">0</div>
+        </div>
+
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>IP Address</th>
+                    <th>DNS</th>
+                    <th>Server</th>
+                    <th>Website</th>
+                    <th>HTTP</th>
+                    <th>Response</th>
+                    <th>Diagnosis</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <tr>
+                    <td colspan="8" class="loading">Enter a domain above to start monitoring.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="history-panel">
+        <div class="history-panel-header">
+            <h3>📋 Recent Scans</h3>
+            <button class="refresh-btn" onclick="loadHistory()">↻ Refresh</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <div class="history-empty">Loading recent scans...</div>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+let currentScanRootDomain = null;
+
+
+function openHelp() { document.getElementById("helpOverlay").classList.add("show"); }
+function closeHelp() { document.getElementById("helpOverlay").classList.remove("show"); }
+
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+        closeHelp();
+        closeScanDetail();
+        closeDomainDetail();
+    }
+});
+
+
+function showToast(message, type) {
+    type = type || "success";
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "toast " + type + " show";
+    setTimeout(() => { toast.classList.remove("show"); }, 3000);
+}
+
+
+async function startMonitoring() {
+
+    const input = document.getElementById("domainInput");
+    const button = document.getElementById("checkButton");
+    const resultsBody = document.getElementById("resultsBody");
+    const watchlistBtn = document.getElementById("watchlistBtn");
+
+    let domain = input.value.trim().toLowerCase();
+
+    if (!domain) {
+        showToast("Please enter a domain name.", "error");
+        return;
+    }
+
+    domain = domain.replace("https://", "").replace("http://", "").replace(/\/+$/, "");
+
+    button.disabled = true;
+    button.textContent = "Checking...";
+    watchlistBtn.style.display = "none";
+    currentScanRootDomain = null;
+
+    resultsBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="loading">
+                <div class="spinner"></div>
+                Discovering subdomains and checking servers...
+                <span class="hint">This can take 10–30 seconds depending on how many subdomains exist.</span>
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(
+            `/web-monitor/monitor/${encodeURIComponent(domain)}`,
+            { cache: "no-store" }
+        );
+
+        if (!response.ok) throw new Error(`Server returned HTTP ${response.status}`);
+
+        const data = await response.json();
+        displayResults(data);
+                saveLastWebScan(data);
+
+
+        currentScanRootDomain = data.root_domain;
+        watchlistBtn.style.display = "inline-block";
+        watchlistBtn.disabled = false;
+        watchlistBtn.classList.remove("saved");
+        watchlistBtn.textContent = "⭐ Save to Watchlist";
+
+        loadHistory();
+
+    } catch (error) {
+        console.error("Monitoring error:", error);
+        resultsBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="error">
+                    ❌ Unable to complete scan.
+                    <br><br>
+                    <small>${escapeHtml(error.message)}</small>
+                </td>
+            </tr>
+        `;
+    } finally {
+        button.disabled = false;
+        button.textContent = "Check Domain";
+    }
+}
+
+
+function displayResults(data) {
+
+    const results = data.results || [];
+    const resultsBody = document.getElementById("resultsBody");
+
+    document.getElementById("monitorInfo").classList.add("active");
+    document.getElementById("rootDomain").textContent = data.root_domain || "-";
+    document.getElementById("targetCount").textContent = `${results.length} target(s)`;
+
+    let discoveryBanner = document.getElementById("discoveryBanner");
+
+    if (!discoveryBanner) {
+        discoveryBanner = document.createElement("div");
+        discoveryBanner.id = "discoveryBanner";
+        discoveryBanner.className = "discovery-banner";
+        document.getElementById("monitorInfo")
+            .insertAdjacentElement("afterend", discoveryBanner);
+    }
+
+    const discovery = data.discovery || {};
+
+    if (discovery.degraded) {
+        discoveryBanner.className = "discovery-banner warn";
+        discoveryBanner.style.display = "flex";
+        discoveryBanner.innerHTML =
+            `⚠️ <span>${escapeHtml(discovery.warning || "Subdomain discovery was degraded this run.")}</span>`;
+    } else if (discovery.source) {
+        discoveryBanner.className = "discovery-banner ok";
+        discoveryBanner.style.display = "flex";
+        discoveryBanner.innerHTML = `✅ <span>Live scan just now</span>`;
+    } else {
+        discoveryBanner.style.display = "none";
+    }
+
+    document.getElementById("lastCheck").textContent = new Date().toLocaleTimeString();
+
+    let up = 0, down = 0, degraded = 0;
+
+    if (results.length === 0) {
+        resultsBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="loading">No monitoring targets found.</td>
+            </tr>
+        `;
+        updateSummary(0, 0, 0, 0);
+        return;
+    }
+
+    resultsBody.innerHTML = "";
+
+    results.forEach(result => {
+        const status = result.overall_status;
+        if (status === "UP") up++;
+        else if (status === "DEGRADED") degraded++;
+        else down++;
+
+        const row = document.createElement("tr");
+
+        // Phase 1.10: subdomain is clickable → opens deep detail modal
+        // IP is clickable → jumps to Server Monitor with IP pre-filled
+        const domainCell = `
+            <a href="#"
+               class="domain-link"
+               onclick="event.preventDefault(); openDomainDetail('${escapeHtml(result.domain).replace(/'/g, "\\'")}')"
+               title="Click for deep DNS/HTTP/SSL analysis">
+                <span class="domain-name">${escapeHtml(result.domain)}</span>
+            </a>
+        `;
+
+        const ipCell = result.ip
+            ? `<a href="/server-monitor?ip=${encodeURIComponent(result.ip)}&autorun=1"
+                  class="ip-link ip"
+                  title="Look up this IP in Server Monitor">${escapeHtml(result.ip)}</a>`
+            : `<span class="ip">N/A</span>`;
+
+        row.innerHTML = `
+            <td>${domainCell}</td>
+            <td>${ipCell}</td>
+            <td>${statusBadge(result.dns_status)}</td>
+            <td>${statusBadge(result.server_status)}</td>
+            <td>${statusBadge(result.website_status)}</td>
+            <td>${result.http_status || "N/A"}</td>
+            <td>${
+                result.response_time !== null && result.response_time !== undefined
+                    ? result.response_time + " ms"
+                    : "N/A"
+            }</td>
+            <td>${statusBadge(status)}</td>
+        `;
+
+        resultsBody.appendChild(row);
+    });
+
+    updateSummary(results.length, up, down, degraded);
+}
+
+
+function updateSummary(total, up, down, degraded) {
+    document.getElementById("totalTargets").textContent = total;
+    document.getElementById("upTargets").textContent = up;
+    document.getElementById("downTargets").textContent = down;
+    document.getElementById("degradedTargets").textContent = degraded;
+}
+
+
+async function saveToWatchlist() {
+    if (!currentScanRootDomain) {
+        showToast("No scan to save. Run a scan first.", "error");
+        return;
+    }
+
+    const btn = document.getElementById("watchlistBtn");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+        const response = await fetch("/web-monitor/api/watch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: currentScanRootDomain }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        btn.classList.add("saved");
+        btn.textContent = data.data.already_watched
+            ? "⭐ Already in watchlist"
+            : "✓ Added to watchlist";
+        showToast(
+            data.data.already_watched
+                ? `${currentScanRootDomain} is already in your watchlist`
+                : `Added ${currentScanRootDomain} to your watchlist`,
+            "success"
+        );
+    } catch (error) {
+        console.error("Watchlist save error:", error);
+        btn.disabled = false;
+        btn.textContent = "⭐ Save to Watchlist";
+        showToast("Could not save: " + error.message, "error");
+    }
+}
+
+
+async function loadHistory() {
+    const list = document.getElementById("historyList");
+    list.innerHTML = `<div class="history-empty">Loading recent scans...</div>`;
+
+    try {
+        const response = await fetch("/web-monitor/api/history", { cache: "no-store" });
+
+        if (response.status === 401) {
+            list.innerHTML = `<div class="history-empty">Sign in to see your scan history.</div>`;
+            return;
+        }
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        const scans = (data.data || []);
+
+        if (scans.length === 0) {
+            list.innerHTML = `<div class="history-empty">No scans yet — run one above to get started.</div>`;
+            return;
+        }
+
+        list.innerHTML = "";
+        scans.forEach(scan => {
+            const item = document.createElement("div");
+            item.className = "history-item";
+            item.innerHTML = `
+                <div class="history-item-main">
+                    <div class="history-item-domain">${escapeHtml(scan.root_domain)}</div>
+                    <div class="history-item-meta">
+                        ${formatDate(scan.started_at)} · ${scan.total_targets} target(s)
+                    </div>
+                </div>
+                <div class="history-item-counts">
+                    ${scan.up_count > 0 ? `<span class="history-count up">${scan.up_count} UP</span>` : ""}
+                    ${scan.degraded_count > 0 ? `<span class="history-count degraded">${scan.degraded_count} DEG</span>` : ""}
+                    ${scan.down_count > 0 ? `<span class="history-count down">${scan.down_count} DOWN</span>` : ""}
+                </div>
+                <button class="history-view-btn" onclick="viewScanDetail(${scan.id})">
+                    View
+                </button>
+            `;
+            list.appendChild(item);
+        });
+
+    } catch (error) {
+        console.error("History load error:", error);
+        list.innerHTML =
+            `<div class="history-empty">Could not load history: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+
+async function viewScanDetail(scanId) {
+    const overlay = document.getElementById("scanDetailOverlay");
+    const title = document.getElementById("scanDetailTitle");
+    const body = document.getElementById("scanDetailBody");
+
+    overlay.classList.add("show");
+    title.textContent = "📊 Scan Details";
+    body.innerHTML = `<div class="loading"><div class="spinner"></div>Loading scan details...</div>`;
+
+    try {
+        const response = await fetch(`/web-monitor/api/scan/${scanId}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        const scan = data.data.scan;
+        const results = data.data.results;
+
+        title.textContent = `📊 ${scan.root_domain} — ${formatDate(scan.started_at)}`;
+
+        let html = `
+            <div class="scan-detail-summary">
+                <div class="scan-detail-summary-item">
+                    <span class="lbl">Root Domain</span>
+                    <span class="val">${escapeHtml(scan.root_domain)}</span>
+                </div>
+                <div class="scan-detail-summary-item">
+                    <span class="lbl">Scanned At</span>
+                    <span class="val">${formatDate(scan.started_at)}</span>
+                </div>
+                <div class="scan-detail-summary-item">
+                    <span class="lbl">Total Targets</span>
+                    <span class="val">${scan.total_targets}</span>
+                </div>
+                <div class="scan-detail-summary-item">
+                    <span class="lbl">Results</span>
+                    <span class="val">
+                        <span style="color:#16a34a;">${scan.up_count} up</span> ·
+                        <span style="color:#d97706;">${scan.degraded_count} deg</span> ·
+                        <span style="color:#dc2626;">${scan.down_count} down</span>
+                    </span>
+                </div>
+            </div>
+
+            <table class="scan-detail-table">
+                <thead>
+                    <tr><th>Target</th><th>IP</th><th>HTTP</th><th>Response</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+        `;
+
+        results.forEach(r => {
+            html += `
+                <tr>
+                    <td><b>${escapeHtml(r.target)}</b></td>
+                    <td style="font-family:monospace;color:#6b7280;">${escapeHtml(r.ip || "-")}</td>
+                    <td>${r.http_status || "-"}</td>
+                    <td>${r.response_time_ms !== null && r.response_time_ms !== undefined ? r.response_time_ms + " ms" : "-"}</td>
+                    <td>${statusBadge(r.overall_status)}</td>
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table>`;
+
+        body.innerHTML = html;
+
+    } catch (error) {
+        console.error("Scan detail error:", error);
+        body.innerHTML = `<div class="error">Could not load scan: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function closeScanDetail() {
+    document.getElementById("scanDetailOverlay").classList.remove("show");
+}
+
+
+// ============================================================
+// PHASE 1.10 — DOMAIN DEEP DETAIL MODAL
+// ============================================================
+
+async function openDomainDetail(domain) {
+    const overlay = document.getElementById("domainDetailOverlay");
+    const title = document.getElementById("domainDetailTitle");
+    const body = document.getElementById("domainDetailBody");
+
+    overlay.classList.add("show");
+    title.textContent = `🔍 ${domain}`;
+    body.innerHTML = `
+        <div class="detail-loading">
+            <div class="spinner"></div>
+            Analyzing ${escapeHtml(domain)}...<br>
+            <span style="font-size:12px;color:#9ca3af;">
+                Running DNS, HTTP, and SSL checks in parallel (~5-10 seconds)
+            </span>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(
+            `/web-monitor/api/domain/${encodeURIComponent(domain)}/detail`,
+            { cache: "no-store" }
+        );
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || "Analysis failed");
+
+        renderDomainDetail(data.data);
+
+    } catch (error) {
+        console.error("Domain detail error:", error);
+        body.innerHTML = `
+            <div class="detail-error">
+                Could not analyze domain: ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+
+function closeDomainDetail() {
+    document.getElementById("domainDetailOverlay").classList.remove("show");
+}
+
+function renderDomainDetail(d) {
+    const body = document.getElementById("domainDetailBody");
+
+    const overview = d.overview || {};
+    const overviewHtml = `
+        <div class="detail-overview">
+            <div class="detail-overview-item">
+                <span class="lbl">Primary IP</span>
+                <span class="val" style="font-family:'JetBrains Mono',monospace;">
+                    ${overview.ip
+                        ? `<a href="/server-monitor?ip=${encodeURIComponent(overview.ip)}&autorun=1"
+                              class="ip-link">${escapeHtml(overview.ip)}</a>`
+                        : "—"}
+                </span>
+            </div>
+            <div class="detail-overview-item">
+                <span class="lbl">HTTP Status</span>
+                <span class="val">
+                    ${overview.status_code || "—"}
+                    ${overview.status_code >= 200 && overview.status_code < 400
+                        ? '<span class="detail-badge good">OK</span>'
+                        : overview.status_code >= 400 && overview.status_code < 500
+                            ? '<span class="detail-badge warn">Client Error</span>'
+                            : overview.status_code >= 500
+                                ? '<span class="detail-badge bad">Server Error</span>'
+                                : ""}
+                </span>
+            </div>
+            <div class="detail-overview-item">
+                <span class="lbl">Response Time</span>
+                <span class="val">
+                    ${overview.response_time_ms !== null
+                        ? overview.response_time_ms + " ms"
+                        : "—"}
+                </span>
+            </div>
+            <div class="detail-overview-item">
+                <span class="lbl">HTTPS Available</span>
+                <span class="val">
+                    ${overview.https_available
+                        ? '<span class="detail-badge good">Yes</span>'
+                        : '<span class="detail-badge bad">No</span>'}
+                </span>
+            </div>
+        </div>
+    `;
+
+    const dns = d.dns || {};
+    const dnsHtml = `
+        <div class="detail-section">
+            <h4 class="detail-section-header">DNS Records</h4>
+            <table class="detail-kv-table">
+                <tr><td>A (IPv4)</td><td>${renderList(dns.a, "No A records")}</td></tr>
+                <tr><td>AAAA (IPv6)</td><td>${renderList(dns.aaaa, "No AAAA records")}</td></tr>
+                <tr><td>CNAME</td><td>${renderList(dns.cname, "No CNAME records")}</td></tr>
+                <tr><td>MX (Mail)</td><td>${renderMxList(dns.mx)}</td></tr>
+                <tr><td>TXT</td><td>${renderList(dns.txt, "No TXT records")}</td></tr>
+            </table>
+            ${dns.errors && dns.errors.length
+                ? `<div style="margin-top:8px;font-size:11.5px;color:#92400e;">
+                       ${dns.errors.map(e => `⚠ ${escapeHtml(e)}`).join('<br>')}
+                   </div>`
+                : ""}
+        </div>
+    `;
+
+    const http = d.http || {};
+    let httpHtml = `<div class="detail-section">
+        <h4 class="detail-section-header">HTTP Response</h4>`;
+
+    if (!http.reachable) {
+        httpHtml += `<div class="detail-list empty">
+            HTTP request failed: ${escapeHtml(http.error || "unknown error")}
+        </div>`;
+    } else {
+        httpHtml += `<table class="detail-kv-table">
+            <tr><td>Status Code</td><td>${http.status_code}</td></tr>
+            <tr><td>Final URL</td><td>${escapeHtml(http.final_url)}</td></tr>
+            <tr><td>Response Size</td><td>${(http.content_length / 1024).toFixed(1)} KB</td></tr>
+            <tr><td>Response Time</td><td>${http.response_time_ms} ms</td></tr>
+        </table>`;
+
+        if (http.redirect_chain && http.redirect_chain.length) {
+            httpHtml += `<h4 class="detail-section-header" style="margin-top:16px;">
+                Redirect Chain (${http.redirect_chain.length} hops)
+            </h4>`;
+            httpHtml += `<ol class="detail-list">`;
+            http.redirect_chain.forEach(hop => {
+                httpHtml += `<li>[${hop.status_code}] ${escapeHtml(hop.url)}</li>`;
+            });
+            httpHtml += `</ol>`;
+        }
+
+        const notableHeaders = ["Server", "Content-Type", "Content-Encoding",
+                                "Strict-Transport-Security", "X-Frame-Options",
+                                "Cache-Control", "X-Powered-By"];
+        const foundHeaders = notableHeaders.filter(h =>
+            http.headers[h] || http.headers[h.toLowerCase()]);
+
+        if (foundHeaders.length) {
+            httpHtml += `<h4 class="detail-section-header" style="margin-top:16px;">
+                Notable Headers
+            </h4>`;
+            httpHtml += `<table class="detail-kv-table">`;
+            foundHeaders.forEach(h => {
+                const val = http.headers[h] || http.headers[h.toLowerCase()];
+                httpHtml += `<tr><td>${h}</td><td>${escapeHtml(val)}</td></tr>`;
+            });
+            httpHtml += `</table>`;
+        }
+    }
+    httpHtml += `</div>`;
+
+    const ssl = d.ssl || {};
+    let sslHtml = `<div class="detail-section">
+        <h4 class="detail-section-header">SSL / TLS Certificate</h4>`;
+
+    if (!ssl.available) {
+        sslHtml += `<div class="detail-list empty">
+            ${escapeHtml(ssl.error || "SSL/TLS not available")}
+        </div>`;
+    } else {
+        let expiryBadge = "";
+        if (ssl.days_remaining !== null) {
+            if (ssl.days_remaining < 0) {
+                expiryBadge = '<span class="detail-badge bad">EXPIRED</span>';
+            } else if (ssl.days_remaining < 15) {
+                expiryBadge = `<span class="detail-badge warn">Expires in ${ssl.days_remaining} days</span>`;
+            } else {
+                expiryBadge = `<span class="detail-badge good">${ssl.days_remaining} days left</span>`;
+            }
+        }
+
+        sslHtml += `<table class="detail-kv-table">
+            <tr><td>Subject</td><td>${escapeHtml(ssl.subject || "—")}</td></tr>
+            <tr><td>Issuer</td><td>${escapeHtml(ssl.issuer || "—")}</td></tr>
+            <tr><td>Valid From</td><td>${escapeHtml(ssl.valid_from || "—")}</td></tr>
+            <tr><td>Valid Until</td><td>${escapeHtml(ssl.valid_until || "—")} ${expiryBadge}</td></tr>
+            <tr><td>TLS Version</td><td>${escapeHtml(ssl.tls_version || "—")}</td></tr>
+            <tr><td>Cipher</td><td>${escapeHtml(ssl.cipher || "—")}</td></tr>
+            <tr><td>SANs</td><td>${renderList(ssl.sans, "No SANs")}</td></tr>
+        </table>`;
+    }
+    sslHtml += `</div>`;
+
+    const footerHtml = `
+        <div style="text-align:right;margin-top:20px;padding-top:12px;
+                    border-top:1px solid #f3f4f6;color:#9ca3af;font-size:11.5px;">
+            Analyzed in ${d.analysis_duration_ms} ms · ${formatDate(d.analyzed_at)}
+        </div>
+    `;
+
+    
+    // Phase 1.10.3-4 — placeholder for uptime badges + chart.
+    // Filled in asynchronously by loadDomainHistory() below.
+    const historyHtml = `
+        <div class="detail-section" id="detail-history-section">
+            <h4 class="detail-section-header">Uptime & Response History</h4>
+            <div id="uptime-badges-wrap">
+                <div class="chart-empty">Loading uptime history...</div>
+            </div>
+            <div id="chart-container-wrap" style="margin-top:14px;"></div>
+        </div>
+    `;
+         
+        body.innerHTML =
+        `<div class="detail-section">${overviewHtml}</div>` +
+        dnsHtml + httpHtml + sslHtml + historyHtml + footerHtml;
+
+    // Load history data async (uses saved scan data — instant, no network)
+    loadDomainHistory(d.domain);
+}
+
+function renderList(items, emptyMsg) {
+    if (!items || items.length === 0) {
+        return `<div class="detail-list empty">${emptyMsg}</div>`;
+    }
+    return `<ul class="detail-list">${
+        items.map(item => `<li>${escapeHtml(item)}</li>`).join("")
+    }</ul>`;
+}
+
+function renderMxList(items) {
+    if (!items || items.length === 0) {
+        return `<div class="detail-list empty">No MX records</div>`;
+    }
+    return `<ul class="detail-list">${
+        items.map(m => `<li>[${m.priority}] ${escapeHtml(m.exchange)}</li>`).join("")
+    }</ul>`;
+}
+
+
+
+// ============================================================
+// PHASE 1.10.3-4 — Uptime badges + response time chart
+// ============================================================
+
+let currentDomainChart = null;
+
+async function loadDomainHistory(domain) {
+    const badgesWrap = document.getElementById("uptime-badges-wrap");
+    const chartWrap = document.getElementById("chart-container-wrap");
+
+    try {
+        const response = await fetch(
+            `/web-monitor/api/domain/${encodeURIComponent(domain)}/history`,
+            { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                badgesWrap.innerHTML = `<div class="chart-empty">Sign in to see history.</div>`;
+                return;
+            }
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (!payload.success) throw new Error(payload.error);
+
+        const data = payload.data;
+
+        // ---- Render uptime badges ----
+        badgesWrap.innerHTML = renderUptimeBadges(data.uptime);
+
+        // ---- Render status timeline (Phase 1.10.5) ----
+        // Above the chart because it works even with 1 data point,
+        // whereas the chart needs 2+.
+        chartWrap.innerHTML = renderStatusTimeline(data.history);
+
+        // ---- Render response-time chart (append below timeline) ----
+        if (!data.history || data.history.length < 2) {
+            chartWrap.insertAdjacentHTML("beforeend", `
+                <div class="chart-empty" style="margin-top:14px;">
+                    Only ${data.total_checks} check(s) recorded so far —
+                    trend chart needs at least 2 to draw a line.
+                    <br>Run more scans of the parent domain to build history.
+                </div>
+            `);
+            return;
+        }
+
+        chartWrap.insertAdjacentHTML("beforeend",
+            `<div class="chart-container" style="margin-top:14px;">
+                 <canvas id="responseChart"></canvas>
+             </div>`
+        );
+        renderResponseChart(data.history);
+
+    } catch (error) {
+        console.error("History load error:", error);
+        badgesWrap.innerHTML = `
+            <div class="chart-empty">
+                Could not load history: ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+
+function renderUptimeBadges(uptime) {
+    const windows = ["24h", "7d", "30d"];
+    const labels = { "24h": "Last 24 hours", "7d": "Last 7 days", "30d": "Last 30 days" };
+
+    return `<div class="uptime-badges">` +
+        windows.map(w => {
+            const info = uptime[w] || { percent: null, checks: 0 };
+            let cls = "unknown";
+            let display = "—";
+
+            if (info.percent !== null) {
+                display = info.percent.toFixed(1) + "%";
+                if (info.percent >= 99.5)      cls = "excellent";
+                else if (info.percent >= 95)   cls = "good";
+                else if (info.percent >= 85)   cls = "fair";
+                else                           cls = "poor";
+            }
+
+            return `
+                <div class="uptime-badge ${cls}">
+                    <span class="window">${labels[w]}</span>
+                    <span class="percent">${display}</span>
+                    <span class="checks">${info.checks} check${info.checks === 1 ? "" : "s"}</span>
+                </div>
+            `;
+        }).join("") +
+        `</div>`;
+}
+
+function renderResponseChart(history) {
+    const canvas = document.getElementById("responseChart");
+    if (!canvas) return;
+
+    // Destroy any existing chart on this canvas (prevents ghost charts
+    // when the modal is reopened for a different domain).
+    if (currentDomainChart) {
+        currentDomainChart.destroy();
+        currentDomainChart = null;
+    }
+
+    // Extract data — only points with actual response times
+    const points = history
+        .filter(r => r.response_time_ms !== null && r.response_time_ms !== undefined)
+        .map(r => ({
+            t: new Date(r.checked_at),
+            ms: r.response_time_ms,
+            status: r.overall_status,
+        }));
+
+    if (points.length < 2) {
+        canvas.parentElement.innerHTML = `
+            <div class="chart-empty">Not enough successful checks yet to draw a chart.</div>
+        `;
+        return;
+    }
+
+    // Color each point based on status — visually flags down/degraded checks
+    const pointColors = points.map(p =>
+        p.status === "UP" ? "#16a34a" :
+        p.status === "DEGRADED" ? "#d97706" : "#dc2626"
+    );
+
+    currentDomainChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: points.map(p => p.t.toLocaleString([], {
+                month: "short", day: "numeric",
+                hour: "2-digit", minute: "2-digit",
+            })),
+            datasets: [{
+                label: "Response time (ms)",
+                data: points.map(p => p.ms),
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37, 99, 235, 0.08)",
+                borderWidth: 2,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.3,
+                fill: true,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: "#111827",
+                    titleColor: "#fff",
+                    bodyColor: "#fff",
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: (ctx) => {
+                            const p = points[ctx.dataIndex];
+                            return [
+                                `${p.ms.toFixed(1)} ms`,
+                                `Status: ${p.status}`,
+                            ];
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        maxTicksLimit: 8,
+                        color: "#6b7280",
+                        font: { size: 10 },
+                    },
+                    grid: { color: "#f3f4f6" },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#6b7280",
+                        font: { size: 11 },
+                        callback: (val) => val + " ms",
+                    },
+                    grid: { color: "#f3f4f6" },
+                },
+            },
+        },
+    });
+}
+
+
+function statusBadge(status) {
+    if (!status) return `<span class="status status-unknown">UNKNOWN</span>`;
+
+    let className = "status-unknown";
+
+    if (status === "UP" || status === "REACHABLE_VIA_HTTP") {
+        className = "status-up";
+    } else if (status === "DEGRADED") {
+        className = "status-degraded";
+    } else if (
+        status === "DOWN" ||
+        status === "WEBSITE_DOWN" ||
+        status === "SERVER_DOWN" ||
+        status === "DNS_FAILED"
+    ) {
+        className = "status-down";
+    }
+
+    return `<span class="status ${className}">${escapeHtml(status)}</span>`;
+}
+
+
+function formatDate(iso) {
+    if (!iso) return "-";
+    try {
+        const d = new Date(iso);
+        return d.toLocaleString();
+    } catch { return iso; }
+}
+
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = String(value == null ? "" : value);
+    return div.innerHTML;
+}
+
+
+document
+    .getElementById("domainInput")
+    .addEventListener("keydown", function(event) {
+        if (event.key === "Enter") startMonitoring();
+    });
+
+
+// ============================================================
+// SESSION PERSISTENCE — restore last scan on page load
+// ============================================================
+// Uses sessionStorage so results survive tab-switches but clear
+// when the browser tab is closed. See saveLastWebScan().
+
+const WEB_LAST_SCAN_KEY = "monitorsuite.webmonitor.lastscan";
+
+function saveLastWebScan(data) {
+    try {
+        sessionStorage.setItem(WEB_LAST_SCAN_KEY, JSON.stringify(data));
+    } catch (e) {
+        // Quota exceeded (rare — sessionStorage is ~5MB) or blocked.
+        // Silently ignore — worst case we lose persistence, not data.
+        console.warn("Could not save scan to sessionStorage:", e);
+    }
+}
+
+function restoreLastWebScan() {
+    try {
+        const raw = sessionStorage.getItem(WEB_LAST_SCAN_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (!data || !data.results) return;
+
+        // Rehydrate the UI as if the scan just finished
+        displayResults(data);
+        currentScanRootDomain = data.root_domain;
+
+        const watchlistBtn = document.getElementById("watchlistBtn");
+        if (watchlistBtn) {
+            watchlistBtn.style.display = "inline-block";
+            watchlistBtn.disabled = false;
+            watchlistBtn.classList.remove("saved");
+            watchlistBtn.textContent = "⭐ Save to Watchlist";
+        }
+
+        // Also refresh the input so user sees which domain is loaded
+        const input = document.getElementById("domainInput");
+        if (input && !input.value) input.value = data.root_domain || "";
+    } catch (e) {
+        console.warn("Could not restore last scan:", e);
+        // If restoration fails, wipe the corrupt entry so it doesn't
+        // keep failing every page load.
+        try { sessionStorage.removeItem(WEB_LAST_SCAN_KEY); } catch(_) {}
+    }
+}
+
+
+// Restore any previous scan first, then load history panel.
+restoreLastWebScan();
+loadHistory();
+
+
+// ============================================================
+// PHASE 1.10.5 — Status timeline visualization
+// ============================================================
+
+function renderStatusTimeline(history) {
+    if (!history || history.length === 0) {
+        return `
+            <div class="status-timeline-wrap">
+                <div class="status-timeline-empty">
+                    No check history yet — run a scan to see the timeline.
+                </div>
+            </div>
+        `;
+    }
+
+    // Timeline shows oldest → newest (left → right)
+    // — that's the same order the API returns rows in.
+    const firstCheck = new Date(history[0].checked_at);
+    const lastCheck = new Date(history[history.length - 1].checked_at);
+
+    // Segments — one per check. If there are too many (say, >100),
+    // downsample so the bar stays readable.
+    const MAX_SEGMENTS = 100;
+    let displayHistory = history;
+    if (history.length > MAX_SEGMENTS) {
+        const step = Math.ceil(history.length / MAX_SEGMENTS);
+        displayHistory = history.filter((_, i) => i % step === 0);
+    }
+
+    const segmentsHtml = displayHistory.map(r => {
+        let cls = "unknown";
+        if (r.overall_status === "UP") cls = "up";
+        else if (r.overall_status === "DEGRADED") cls = "degraded";
+        else if (r.overall_status) cls = "down";
+
+        const time = new Date(r.checked_at).toLocaleString([], {
+            month: "short", day: "numeric",
+            hour: "2-digit", minute: "2-digit",
+        });
+        const ms = r.response_time_ms !== null && r.response_time_ms !== undefined
+            ? ` · ${r.response_time_ms.toFixed(0)}ms`
+            : "";
+        const httpCode = r.http_status ? ` · HTTP ${r.http_status}` : "";
+
+        const tooltipText = `${time} · ${r.overall_status}${httpCode}${ms}`;
+
+        return `
+            <div class="status-segment ${cls}"
+                 title="${escapeHtml(tooltipText)}">
+                <span class="status-segment-tooltip">${escapeHtml(tooltipText)}</span>
+            </div>
+        `;
+    }).join("");
+
+    return `
+        <div class="status-timeline-wrap">
+            <div class="status-timeline-header">
+                <span>Status Timeline (${history.length} check${history.length === 1 ? "" : "s"})</span>
+                <span class="range">
+                    ${firstCheck.toLocaleDateString([], {month:"short",day:"numeric"})}
+                    →
+                    ${lastCheck.toLocaleDateString([], {month:"short",day:"numeric"})}
+                </span>
+            </div>
+            <div class="status-timeline">
+                ${segmentsHtml}
+            </div>
+            <div class="status-timeline-legend">
+                <span><span class="dot" style="background:#16a34a;"></span>UP</span>
+                <span><span class="dot" style="background:#d97706;"></span>Degraded</span>
+                <span><span class="dot" style="background:#dc2626;"></span>Down</span>
+            </div>
+        </div>
+    `;
+}
+
+</script>
+
+
+</body>
+
+</html>

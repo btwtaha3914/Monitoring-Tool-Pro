@@ -1,0 +1,237 @@
+/*
+ * Monitor Suite — Design System
+ * ===============================
+ * ONE source of truth for colors, spacing, typography, shadows,
+ * and layout tokens. Every page imports this file so a color change
+ * once = change everywhere.
+ *
+ * DO NOT put component-specific styles here (buttons, cards, etc.).
+ * Those go in components.css.
+ *
+ * Naming convention: --category-role
+ *   --color-primary, --color-danger  (semantic)
+ *   --space-md, --space-lg           (t-shirt sizes)
+ *   --radius-sm, --radius-lg
+ */
+
+:root {
+  /* ---------------- Colors: Semantic ---------------- */
+  --color-primary:        #2563eb;
+  --color-primary-dark:   #1d4ed8;
+  --color-primary-light:  #eff6ff;
+
+  --color-success:        #16a34a;
+  --color-success-light:  #f0fdf4;
+  --color-success-border: #bbf7d0;
+
+  --color-warning:        #d97706;
+  --color-warning-light:  #fef3c7;
+  --color-warning-border: #fde68a;
+
+  --color-danger:         #dc2626;
+  --color-danger-light:   #fef2f2;
+  --color-danger-border:  #fecaca;
+
+  /* ---------------- Colors: Surfaces ---------------- */
+  --color-bg:             #f4f7fb;
+  --color-surface:        #ffffff;
+  --color-surface-alt:    #f9fafb;
+  --color-surface-hover:  #f3f4f6;
+
+  /* ---------------- Colors: Text ---------------- */
+  --color-text:           #111827;   /* primary text */
+  --color-text-muted:     #6b7280;   /* labels, hints */
+  --color-text-subtle:    #9ca3af;   /* placeholders */
+  --color-text-inverse:   #ffffff;   /* text on colored backgrounds */
+
+  /* ---------------- Colors: Borders ---------------- */
+  --color-border:         #e5e7eb;
+  --color-border-strong:  #d1d5db;
+
+  /* ---------------- Typography ---------------- */
+/* Inter — used by Vercel, Linear, Stripe, GitHub, Figma, Notion.
+   Designed specifically for UI, not print. Falls back to system UI
+   fonts if the webfont fails to load. */
+--font-sans: "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+/* JetBrains Mono — for IPs, MAC addresses, code snippets, anything
+   monospace. Falls back to system mono fonts. */
+--font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+  /* Type scale — modeled after Vercel/Linear.
+   Inter reads slightly smaller than Arial at same px, so we bump
+   sizes up slightly for equivalent legibility. */
+--font-size-xs:   11.5px;
+--font-size-sm:   13px;
+--font-size-base: 14.5px;
+--font-size-md:   15.5px;
+--font-size-lg:   18px;
+--font-size-xl:   24px;
+--font-size-xxl:  32px;
+--font-size-hero: 40px;
+
+/* Full Inter weight range — enables strong hierarchy */
+--font-weight-normal:  400;
+--font-weight-medium:  500;
+--font-weight-semi:    600;
+--font-weight-bold:    700;
+--font-weight-extra:   800;
+--font-weight-black:   900;
+
+--line-height-tight:   1.2;
+--line-height-normal:  1.5;
+--line-height-relaxed: 1.65;
+
+/* Letter-spacing — Inter looks best with slight negative tracking
+   on headlines (like Vercel/Linear). */
+--letter-spacing-tight:  -0.02em;
+--letter-spacing-normal: 0;
+--letter-spacing-wide:   0.04em;
+
+  /* ---------------- Spacing (T-shirt sizes) ---------------- */
+  --space-xs:   4px;
+  --space-sm:   8px;
+  --space-md:   14px;
+  --space-lg:   20px;
+  --space-xl:   28px;
+  --space-2xl:  40px;
+
+  /* ---------------- Border Radius ---------------- */
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-pill: 999px;
+
+  /* ---------------- Shadows ---------------- */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 10px 30px rgba(16, 24, 40, 0.12);
+  --shadow-xl: 0 20px 60px rgba(16, 24, 40, 0.15);
+
+  /* ---------------- Transitions ---------------- */
+  --transition-fast: .12s ease;
+  --transition-base: .18s ease;
+
+  /* ---------------- Layout ---------------- */
+  --container-max: 1200px;
+  --container-narrow: 900px;
+}
+
+/* ---------------- Global Reset (safe defaults) ---------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Font features from Inter — enables ligatures, alternate digits,
+     tabular figures for numbers. Makes tables of numbers align
+     perfectly. */
+  font-feature-settings: "ss01", "cv01", "cv02", "cv11";
+  text-rendering: optimizeLegibility;
+}
+
+/* Default heading rhythm — every heading gets tight letter-spacing
+   and semi-bold weight like Vercel/Linear. Individual pages can
+   still override. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  letter-spacing: var(--letter-spacing-tight);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+}
+
+/* Monospace elements — IPs, code, tabular data. Uses tabular
+   number variant so digits line up in columns. */
+code, pre, .mono, .font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+/* Force tabular numbers on any element with .num — good for stat
+   cards, latency values, counts. */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Utility: hidden but preserves layout for screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ============================================================
+ * PHASE 1.9 TRANSITIONAL — FORCE INTER GLOBALLY
+ * ============================================================
+ * Until every page template is refactored to remove its inline
+ * <style> font-family declarations (Sub-steps 1.9.3–1.9.7),
+ * this rule forces Inter to win against inline styles.
+ *
+ * REMOVE this block once all pages are refactored — inheritance
+ * from body will handle it naturally at that point.
+ */
+
+body, body *:not(code):not(pre):not(.mono):not(.font-mono) {
+  font-family: var(--font-sans) !important;
+}
+
+code, pre, .mono, .font-mono {
+  font-family: var(--font-mono) !important;
+}
+
+
+/* ============================================================
+ * PHASE 1.9 TRANSITIONAL — Force Inter globally
+ * ============================================================
+ * Legacy inline <style> blocks in the page templates declare
+ * their own font-family (Arial/Helvetica), which would win over
+ * inherited fonts. This block forces Inter on everything except
+ * explicit monospace elements.
+ *
+ * Remove once page templates are refactored (Phase 1.9 later).
+ */
+
+body,
+body *:not(code):not(pre):not(.mono):not(.font-mono):not([class*="mono"]) {
+  font-family: "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif !important;
+}
+
+code, pre, .mono, .font-mono, [class*="mono"] {
+  font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, "Courier New", monospace !important;
+}
+
+/* Global rendering polish — makes Inter look crisp on all screens */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv11";
+}
+
+/* Force tabular numerals on numbers — makes stat cards / tables of
+   numbers align in perfect columns instead of shifting per digit. */
+.num, .value, .stat-value, td.mono, td[class*="num"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}

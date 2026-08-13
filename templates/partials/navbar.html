@@ -1,0 +1,51 @@
+{#
+  Navbar partial — loaded by every page (via direct include or base.html).
+
+  The <link> tags below are here for pages that haven't yet been
+  migrated to base.html (Sub-steps 1.9.3-1.9.7). Browsers auto-hoist
+  <link> tags in the body to <head>, so this is a safe transitional
+  bridge. Once all pages use base.html, we can remove these <link>
+  tags — the base template will handle CSS loading properly.
+#}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/design_system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+<nav class="navbar">
+    <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+        <span class="dot"></span> Monitor&nbsp;Suite
+    </a>
+
+    <div class="navbar-links">
+        <a href="{{ url_for('dashboard') }}"
+           class="{{ 'active' if active=='dashboard' else '' }}">
+            🏠 <span class="full">Dashboard</span>
+        </a>
+        <a href="{{ url_for('web_monitor.index') }}"
+           class="{{ 'active' if active=='web' else '' }}">
+            🌐 <span class="full">Web Monitor</span>
+        </a>
+        <a href="{{ url_for('signal_monitor.index') }}"
+           class="{{ 'active' if active=='signal' else '' }}">
+            📶 <span class="full">Signal Monitor</span>
+        </a>
+        <a href="{{ url_for('server_monitor.console') }}"
+           class="{{ 'active' if active=='server' else '' }}">
+            🖥️ <span class="full">Server Monitor</span>
+        </a>
+    </div>
+
+    <div class="navbar-right">
+        <span class="navbar-user"
+      data-initial="{{ (session.get('user', 'G') | first | upper) }}">
+    <b>{{ session.get('user', 'Guest') }}</b>
+</span>
+        {% if session.get('guest') %}
+            <a class="navbar-signin" href="{{ url_for('logout') }}">Sign In</a>
+        {% else %}
+            <a class="navbar-logout" href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </div>
+</nav>
